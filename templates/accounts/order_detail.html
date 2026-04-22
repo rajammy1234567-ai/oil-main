@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.pk }} - CattleCart{% endblock %}
+
+{% block extra_css %}
+<style>
+.order-detail { max-width:900px;margin:36px auto; }
+.order-card { background:#fff;border-radius:8px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,0.04); }
+.order-items { display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;border-bottom:1px solid #f3f3f3;padding-bottom:12px;margin-bottom:12px; }
+.order-items .img{width:20px;height:120px;object-fit:cover;border-radius:6px}
+.timeline { margin-top:18px }
+.timeline .step { padding:12px 0;border-bottom:1px dashed #eee }
+.timeline .time { color:#888;font-size:13px }
+.address-card, .price-card { background:#fff;padding:12px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.04); }
+.price-row { display:flex;justify-content:space-between;padding:6px 0 }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-card order-detail">
+        <h2>Order #{{ order.pk }} {% if order.receipt %}/ {{ order.receipt }}{% endif %}</h2>
+        <p>Placed: {{ order.created_at|date:"d M Y H:i" }} &nbsp; • &nbsp; Status: {{ order.get_status_display }}</p>
+
+        {% if items and items|length > 0 %}
+            {% for item in items %}
+            <div class="order-items">
+                <div>
+                    {% if item.image %}
+                        <img style="max-width: 121px;" src="{{ item.image }}" alt="{{ item.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/120" alt="{{ item.title }}">
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 style="margin:0">{{ item.title }}</h3>
+                    <div class="cart-item-seller">Seller: <span>MANTARIX</span></div>
+                    <div style="color:#666;margin:6px 0">{{ item.options }}</div>
+                    <div style="font-weight:700">₹ {{ item.price }}</div>
+                    <div style="margin-top:8px;color:#666">Qty: {{ item.quantity }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No item details available.</p>
+        {% endif %}
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+            <div class="address-card" style="flex:1;min-width:260px;">
+                <h4>Delivery details</h4>
+                {% if address %}
+                <div>{{ address.user.get_full_name|default:address.user.username }}</div>
+                <div>{{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif %}</div>
+                <div>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</div>
+                <div>{{ address.country }}</div>
+                <div style="margin-top:8px">Phone: {{ address.phone }}</div>
+                {% else %}
+                <div>No address on file.</div>
+                {% endif %}
+            </div>
+
+            <div class="price-card" style="width:320px;">
+                <h4>Price details</h4>
+                <div class="price-row"><div>Order amount</div><div>₹ {{ order.amount }}</div></div>
+                <div class="price-row"><div>Delivery</div><div>Free</div></div>
+                <div class="price-row" style="font-weight:700;border-top:1px solid #eee;padding-top:8px"><div>Total</div><div>₹ {{ order.amount }}</div></div>
+                <div style="margin-top:10px">Payment method: <strong>{{ payment_method }}</strong></div>
+                {% if order.delivery_date %}
+                <div style="margin-top:8px">Estimated delivery: <strong>{{ order.delivery_date|date:"d M Y" }}</strong></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="timeline">
+            <h4>Order updates</h4>
+            {% if timeline %}
+            {% for step in timeline %}
+            <div class="step">
+                <div style="font-weight:700">{{ step.title }}</div>
+                <div class="time">{{ step.time|date:"D, d M Y H:i" }}</div>
+                <div style="color:#555">{{ step.desc }}</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No tracking updates yet.</p>
+            {% endif %}
+
+        </div>
+
+    </div>
+{% endblock %}

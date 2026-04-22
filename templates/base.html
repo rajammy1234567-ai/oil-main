@@ -1,0 +1,735 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="India's trusted brand for   mustard oil. Buy 100% pure mustard oil for authentic taste and health benefits.">
+
+    <title>
+        {% block title %}Karyor - Mustard Oil{% endblock %}
+    </title>
+
+
+
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+    <!-- Fonts (using system fonts for better performance) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+
+    <!-- JSON-LD structured data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Karyor",
+        "description": "  quality 100% pure mustard oil",
+        "url": "https://www.karyor.in",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.karyor.in/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+</head>
+
+<body>
+
+
+    <!-- Topbar: centered free shipping message -->
+    <div class="topbar">
+        <div class="topbar-content">
+            <span class="topbar-text">100% Pure Cold & Single Pressed Mustard Oil</span>
+        </div>
+    </div>
+
+    <!-- Header: Centered Navigation & Modern Actions -->
+    <header class="site-header">
+        <div class="header-inner">
+            <!-- Brand / Logo -->
+            <div class="brand">
+                <a href="{% url 'home' %}" class="brand-link">
+                    <img src="{% static 'images/logo-whitee.png' %}" alt="Karyor" class="logo-img">
+
+                </a>
+            </div>
+
+            <!-- Centered Navigation Menu -->
+            <nav class="main-nav">
+                <ul class="nav-items">
+                    <li><a href="{% url 'home' %}#products">Products</a></li>
+                    <li><a href="{% url 'health_benefits' %}">Health Benefits</a></li>
+                    <li><a href="{% url 'home' %}#about">About</a></li>
+                    <li><a href="{% url 'home' %}#videos">Videos</a></li>
+                    <li><a href="{% url 'home' %}#contact">Contact</a></li>
+                </ul>
+            </nav>
+
+            <!-- Actions: Search, Cart, Login -->
+            <div class="header-cta">
+                <!-- Search Toggle -->
+                <button class="search-trigger" id="searchBtn" title="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+
+                <!-- Search Overlay -->
+                <div id="searchBarOverlay"
+                    style="display:none; position:fixed; top:123px; left:0; width:100%; background:white; padding:20px 0; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:1999;">
+                    <form action="{% url 'products_list' %}" method="get" class="container"
+                        style="max-width:800px; display:flex; gap:15px;">
+                        <input name="q" placeholder="Search products..."
+                            style="flex:1; padding:12px 25px; border:2px solid #e8f5e9; border-radius:30px; outline:none; font-size:16px;">
+                        <button type="submit" class="btn-primary"
+                            style="padding:10px 30px; border-radius:30px; border:none; background:#6b2121; color:white; font-weight:700; cursor:pointer;">SEARCH</button>
+                    </form>
+                </div>
+
+                <!-- Shopping Cart -->
+                <a href="{% url 'cart' %}" class="cart-link" title="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCount" class="cart-badge">
+                        {% with session_cart=request.session.cart %}
+                        {% if session_cart %}{{ session_cart|length }}{% else %}0{% endif %}
+                        {% endwith %}
+                    </span>
+                </a>
+
+                <!-- User Account / Login Pill -->
+                {% if user.is_authenticated %}
+                <div class="user-dropdown" style="position:relative;">
+                    <button type="button" class="user-info-btn" id="userMenuBtn" onclick="toggleUserMenu(event)">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ user.username }}</span>
+                    </button>
+                    <div class="dropdown-menu" id="userMenu">
+                        <a href="{% url 'accounts:profile' %}">Profile</a>
+                        <a href="{% url 'accounts:orders' %}">My Orders</a>
+                        <hr>
+                        <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="login-pill">Login</a>
+                {% endif %}
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-toggle" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <script>
+        // Interactive Header Scripts
+        document.addEventListener('DOMContentLoaded', function () {
+            // Search Bar Toggle
+            const searchBtn = document.getElementById('searchBtn');
+            const searchBar = document.getElementById('searchBarOverlay');
+            if (searchBtn && searchBar) {
+                searchBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const isHidden = searchBar.style.display === 'none';
+                    searchBar.style.display = isHidden ? 'block' : 'none';
+                    if (isHidden) searchBar.querySelector('input').focus();
+                });
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.contains(e.target) && e.target !== searchBtn) {
+                        searchBar.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // User Dropdown Functionality
+        function toggleUserMenu(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('userMenu');
+            if (menu) {
+                const isHidden = window.getComputedStyle(menu).display === 'none';
+                menu.style.display = isHidden ? 'block' : 'none';
+            }
+        }
+
+        window.addEventListener('click', function (e) {
+            const menu = document.getElementById('userMenu');
+            const btn = document.getElementById('userMenuBtn');
+            if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
+    </script>
+
+
+    <style>
+        @media (max-width: 992px) {
+            .main-nav {
+                display: none !important;
+            }
+
+            .header-search {
+                display: none !important;
+            }
+
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+
+            .header-cta .login-link,
+            .header-cta .user-dropdown {
+                display: none !important;
+            }
+
+            .site-header {
+                height: 60px !important;
+                top: 34px !important;
+            }
+
+            .logo-img {
+                height: 48px !important;
+
+                margin-top: 9px;
+            }
+
+            .header-inner {
+                height: 60px !important;
+                background-color: #353637;
+                color: #000000;
+            }
+
+            .main-content {
+                padding-top: 94px !important;
+            }
+        }
+    </style>
+
+    <!-- Mobile Navigation Menu -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <!-- <img src="{% static 'images/logo-white.png' %}" alt="Mantarix Logo"> -->
+                <div class="logotext"> </div>
+            </div>
+            <button class="close-menu" id="closeMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav class="mobile-nav-links">
+            <a href="{% url 'home' %}" class="mobile-nav-link">
+                <i class="fas fa-home"></i>
+                <span data-translate="home">Home</span>
+            </a>
+            <a href="{% url 'products_list' %}" class="mobile-nav-link">
+                <i class="fas fa-shopping-basket"></i>
+                <span data-translate="products">Products</span>
+            </a>
+            <a href="{% url 'health_benefits' %}" class="mobile-nav-link">
+                <i class="fas fa-heartbeat"></i>
+                <span>Health Benefits</span>
+            </a>
+            <a href="{% url 'products_list' %}#categories" class="mobile-nav-link">
+                <i class="fas fa-list"></i>
+                <span data-translate="categories">Categories</span>
+            </a>
+            <a href="{% url 'home' %}#about" class="mobile-nav-link">
+                <i class="fas fa-info-circle"></i>
+                <span data-translate="about">About</span>
+            </a>
+            <a href="{% url 'home' %}#videos" class="mobile-nav-link">
+                <i class="fas fa-video"></i>
+                <span data-translate="videos">Videos</span>
+            </a>
+            <a href="{% url 'home' %}#contact" class="mobile-nav-link">
+                <i class="fas fa-envelope"></i>
+                <span data-translate="contact">Contact</span>
+            </a>
+
+            {% if user.is_authenticated %}
+            <hr>
+            <a href="{% url 'accounts:profile' %}" class="mobile-nav-link">
+                <i class="fas fa-user"></i>
+                <span data-translate="profile">Profile</span>
+            </a>
+            <a href="{% url 'accounts:orders' %}" class="mobile-nav-link">
+                <i class="fas fa-history"></i>
+                <span data-translate="orders">Orders</span>
+            </a>
+            <a href="{% url 'logout' %}" class="mobile-nav-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-translate="logout">Logout</span>
+            </a>
+            {% else %}
+            <hr>
+            <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="mobile-nav-link">
+                <i class="fas fa-sign-in-alt"></i>
+                <span data-translate="login">Login / Register</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="mobile-nav-footer">
+            <p class="support-text" data-translate="support_text">
+                Need help? Call us: +91 9518845578
+            </p>
+            <div class="social-links">
+                <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <!-- add top padding so main content is not hidden under the fixed header -->
+    <main class="main-content">
+        {% block content %}
+
+        <!-- Banner Slider -->
+        <section id="banner" class="banner-section">
+            <div class="banner-slider">
+                <div class="slide"><img src="https://via.placeholder.com/1200x420?text=Banner+1" alt="Banner 1"></div>
+                <div class="slide"><img src="https://via.placeholder.com/1200x420?text=Banner+2" alt="Banner 2"></div>
+                <div class="slide"><img src="https://via.placeholder.com/1200x420?text=Banner+3" alt="Banner 3"></div>
+            </div>
+        </section>
+
+        <!-- Products (Demo) -->
+        <section id="products" class="products-section">
+            <div class="container">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="products-grid demo-products">
+                    {% for i in "123456" %}
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/300x240?text=Product+{{ forloop.counter }}"
+                            alt="Product {{ forloop.counter }}">
+                        <h3 class="product-name">Demo Product {{ forloop.counter }}</h3>
+                        <p class="product-price">₹ {{ 500|add:forloop.counter }} <span class="original-price">₹ {{
+                                600|add:forloop.counter }}</span></p>
+                        <button class="add-to-cart-btn">Add to cart</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- About (Demo) -->
+        <section id="about" class="about-section">
+            <div class="container">
+                <h2 class="section-title">About Karyor</h2>
+                <p> KARYOR Mustard oil is extracted from premium quality mustard seeds by using single pressed method and filtered traditionally from cloth plates for authentic taste, aroma and health benefits</p>
+            </div>
+        </section>
+
+        <!-- Videos -->
+        <section id="videos" class="videos-section">
+            <div class="container">
+                <h2 class="section-title">Videos</h2>
+                <div class="videos-grid">
+                    <div class="video-card"><img src="https://via.placeholder.com/360x200?text=Video+1">
+                        <p>How to use feed</p>
+                    </div>
+                    <div class="video-card"><img src="https://via.placeholder.com/360x200?text=Video+2">
+                        <p>Farmer stories</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--     -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <h2 class="section-title">Contact</h2>
+                <p>Phone: <a href="tel:+919518845578">9518845578,8059917020</a> &nbsp; Email: support@karyor.in</p>
+            </div>
+        </section>
+
+        {% endblock %}
+    </main>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/919518845578?text=Hi%20Karyor%20Team,%20I%20need%20help%20with%20your%20products"
+        class="whatsapp-float" target="_blank" rel="noopener">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-text" data-translate="whatsapp_help">Need Help?</span>
+    </a>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Company Info -->
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img class="footerlogo" src="{% static 'images/logo-whitee.png' %}" alt="Karyor">
+                        <h3>KARYOR</h3>
+                    </div>
+                    <p class="footer-description" data-translate="footer_description">
+                        KARYOR Mustard oil is extracted from premium quality mustard seeds by using single pressed method and filtered traditionally from cloth plates for authentic taste, aroma and health benefits
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4 data-translate="quick_links">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}"><span data-translate="home">Home</span></a></li>
+                        <li><a href="{% url 'products_list' %}"><span data-translate="products">Products</span></a></li>
+                        <li><a href="{% url 'products_list' %}"><span data-translate="categories">Categories</span></a>
+                        </li>
+                        <li><a href="{% url 'home' %}#about"><span data-translate="about_us">About Us</span></a></li>
+                        <!--  -->
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div class="footer-section">
+                    <h4 data-translate="categories">Categories</h4>
+                    <ul class="footer-links">
+                        {% for category in footer_categories %}
+                        <li><a href="{% url 'category_products' category.slug %}">{{ category.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div id="contact" class="footer-section">
+                    <h4 data-translate="contact_us">Contact Us</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> 9518845578,8059917020</p>
+                        <p><i class="fas fa-envelope"></i> support@karyor.in</p>
+                        <p><i style="margin-bottom: 87%;" class="fas fa-map-marker-alt"></i>
+                            <span data-translate="address"></span>GROUND FLOOR, PLOT NO. 23/14, MIRZAPUR ROAD,MIRZAPUR
+                            ROAD, VISHWAKARMA COLONY, CITY HISAR,DISTRICT HISAR,STATE HARYANA, PIN CODE 125001
+
+                            </span>
+                        </p>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-whatsapp"></i></a>
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    <p>&copy; {% now "Y" %} Karyor. <span data-translate="all_rights">All rights reserved.</span>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'lib/main.js' %}"></script>
+
+    <!-- CSRF Token for AJAX requests -->
+    <script>
+        const CSRF_TOKEN = "{{ csrf_token }}";
+        const CURRENT_LANGUAGE = "{{ request.session.language|default:'en' }}";
+        const USER_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}";
+    </script>
+
+    <!-- Language Translations Dictionary -->
+    <script>
+        const translations = {
+            en: {
+                home: "Home",
+                products: "Products",
+                categories: "Categories",
+                about: "About",
+                videos: "Videos",
+                profile: "Profile",
+                orders: "Orders",
+                logout: "Logout",
+                login: "Login",
+                support_text: "Need help? Call us: +91 9518845578",
+                whatsapp_help: "Need Help?",
+                quick_links: "Quick Links",
+                about_us: "About Us",
+                contact: "Contact",
+                contact_us: "Contact Us",
+
+                all_rights: "All rights reserved.",
+                privacy: "Privacy Policy",
+                terms: "Terms & Conditions",
+                return: "Return Policy",
+                shipping: "Shipping Policy"
+            },
+            hi: {
+                home: "होम",
+                products: "उत्पाद",
+                categories: "श्रेणियाँ",
+                about: "हमारे बारे में",
+                videos: "वीडियो",
+                profile: "प्रोफ़ाइल",
+                orders: "आदेश",
+                logout: "लॉग आउट",
+                login: "लॉगिन",
+                support_text: "मदद चाहिए? हमें कॉल करें: +91 9518845578",
+                whatsapp_help: "मदद चाहिए?",
+                quick_links: "त्वरित लिंक",
+                about_us: "हमारे बारे में",
+                contact: "संपर्क करें",
+                contact_us: "संपर्क करें",
+                address: "मुंबई, महाराष्ट्र, भारत",
+                all_rights: "सर्वाधिकार सुरक्षित।",
+                privacy: "गोपनीयता नीति",
+                terms: "नियम और शर्तें",
+                return: "वापसी नीति",
+                shipping: "शिपिंग नीति"
+            }
+        };
+    </script>
+
+    <script>
+        // Smooth scroll for anchor links and live cart count
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href === '#') return;
+                    const targetId = href.substring(1);
+                    const target = document.getElementById(targetId) || document.querySelector('[name="' + targetId + '"]');
+                    if (target) {
+                        e.preventDefault();
+                        window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Ensure nav links that point to anchors navigate to home first when on other pages
+            document.querySelectorAll('.main-nav .nav-items a').forEach(function (navlink) {
+                navlink.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href.indexOf('#') === -1) return;
+                    // if the link contains a hash but is not on the homepage, navigate to home with the same hash
+                    if (window.location.pathname !== '/') {
+                        e.preventDefault();
+                        // ensure we build a pathlike '/#id' even if href was '/#id' or '#id'
+                        const hashIndex = href.indexOf('#');
+                        const hash = href.substring(hashIndex);
+                        window.location.href = '/' + hash;
+                    }
+                    // otherwise default will be handled by smooth-scroll above
+                });
+            });
+
+            // Fetch cart count and update header
+            fetch('{% url "cart_count" %}').then(r => r.json()).then(data => {
+                const el = document.getElementById('cartCount');
+                if (el && data.cart_count !== undefined) el.textContent = data.cart_count;
+            }).catch(() => { });
+
+            // Language toggle UI (demo only)
+            const toggle = document.getElementById('langToggle');
+            if (toggle) {
+                toggle.addEventListener('click', function () {
+                    const en = document.querySelectorAll('.lang-text[data-lang="en"]');
+                    const hi = document.querySelectorAll('.lang-text[data-lang="hi"]');
+                    en.forEach(e => e.style.display = (e.style.display === 'none') ? 'inline' : 'none');
+                    hi.forEach(h => h.style.display = (h.style.display === 'none') ? 'inline' : 'none');
+                });
+            }
+        });
+        // If page loaded with a hash (e.g. /#products), scroll to target with header offset
+        (function () {
+            try {
+                const hash = window.location.hash;
+                if (hash) {
+                    const id = hash.substring(1);
+                    const el = document.getElementById(id) || document.querySelector('[name="' + id + '"]');
+                    if (el) {
+                        // wait a bit for layout, then scroll
+                        setTimeout(() => {
+                            window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' });
+                        }, 80);
+                    }
+                }
+            } catch (e) {/* ignore */ }
+        })();
+
+        // Simple banner slider (auto)
+        (function () {
+            let idx = 0;
+            const slides = document.querySelectorAll('.banner-slider .slide');
+            if (!slides || slides.length === 0) return;
+            slides.forEach((s, i) => { if (i !== 0) s.style.display = 'none'; });
+            setInterval(() => {
+                slides[idx].style.display = 'none';
+                idx = (idx + 1) % slides.length;
+                slides[idx].style.display = 'block';
+            }, 4000);
+        })();
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeMenuBtn = document.getElementById('closeMenu');
+            const mobileNav = document.getElementById('mobileNav');
+
+            if (mobileMenuBtn && mobileNav) {
+                mobileMenuBtn.addEventListener('click', function () {
+                    mobileNav.classList.add('active');
+                });
+            }
+
+            if (closeMenuBtn && mobileNav) {
+                closeMenuBtn.addEventListener('click', function () {
+                    mobileNav.classList.remove('active');
+                });
+            }
+
+            // Close menu when clicking on a link
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    mobileNav.classList.remove('active');
+                });
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+
+    <!-- Smooth scroll for in-page anchors (about, video, contact, etc.) -->
+    <script>
+        (function () {
+            function isSamePageLink(href) {
+                if (!href) return false;
+                // allow '#id' and '/#id' or current pathname + '#id'
+                try {
+                    const url = new URL(href, window.location.origin);
+                    return url.pathname === window.location.pathname && url.hash && url.hash.length > 1;
+                } catch (e) {
+                    return href.startsWith('#');
+                }
+            }
+            document.addEventListener('click', function (e) {
+                const a = e.target.closest && e.target.closest('a');
+                if (!a) return;
+                const href = a.getAttribute('href');
+                if (isSamePageLink(href)) {
+                    e.preventDefault();
+                    const id = (new URL(href, window.location.origin)).hash.replace('#', '');
+                    const target = document.getElementById(id);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // update history without jumping
+                        history.pushState(null, '', '#' + id);
+                    }
+                }
+            });
+        })();
+    </script>
+    <script>
+        // Global helper to trigger a Razorpay Buy Now flow from any page
+        function buyNow(amount, receipt, meta) {
+            // amount in rupees
+            try {
+                showLoading && showLoading();
+            } catch (e) { }
+            fetch('{% url "create_razorpay_order" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                body: JSON.stringify({ amount: amount, receipt: receipt || null })
+            }).then(r => r.json()).then(data => {
+                try { hideLoading && hideLoading(); } catch (e) { }
+                if (!data || !data.success) { alert('Could not start payment'); return; }
+                const order = data.order;
+                const key = data.key || '';
+                if (typeof Razorpay === 'undefined') {
+                    const s = document.createElement('script');
+                    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                    s.onload = () => openRzp(order, key);
+                    s.onerror = () => alert('Could not load payment script');
+                    document.head.appendChild(s);
+                } else {
+                    openRzp(order, key);
+                }
+
+                function openRzp(order, key) {
+                    const options = {
+                        key: key,
+                        amount: order.amount,
+                        currency: order.currency || 'INR',
+                        amount: order.amount,
+                        currency: order.currency || 'INR',
+                        name: 'Karyor',
+                        description: 'Order Payment',
+                        order_id: order.id,
+                        handler: function (resp) {
+                            fetch('{% url "verify_razorpay_payment" %}', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+                                body: JSON.stringify(resp)
+                            }).then(r => r.json()).then(js => {
+                                if (js && js.success) { alert('Payment successful'); window.location.href = '/'; }
+                                else alert('Payment verification failed');
+                            }).catch(() => alert('Verification failed'));
+                        },
+                        modal: { ondismiss: function () { } }
+                    };
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function (resp) { alert('Payment failed: ' + (resp.error && resp.error.description)); });
+                    rzp.open();
+                }
+            }).catch(err => { try { hideLoading && hideLoading(); } catch (e) { }; alert('Payment error'); });
+        }
+    </script>
+
+    <!-- Razorpay Integration (if on checkout page) -->
+    {% if razorpay_key %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    {% endif %}
+    <script>
+        // Ensure the user menu toggles reliably even if other JS fails
+        (function () {
+            try {
+                var btn = document.getElementById('userMenuBtn');
+                var menu = document.getElementById('userMenu');
+                if (!btn || !menu) return;
+                // Make sure header elements are above any background overlays
+                var headerCta = btn.closest('.header-cta');
+                if (headerCta) headerCta.style.zIndex = 3000;
+                btn.style.zIndex = 3001;
+
+                // Attach a robust click handler
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation && e.stopPropagation();
+                    var isOpen = menu.style.display === 'block';
+                    menu.style.display = isOpen ? 'none' : 'block';
+                    btn.setAttribute('aria-expanded', String(!isOpen));
+                });
+
+                // Close when clicking outside
+                document.addEventListener('click', function (ev) {
+                    if (!btn.contains(ev.target) && !menu.contains(ev.target)) {
+                        menu.style.display = 'none';
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            } catch (err) { console && console.error && console.error('user menu init error', err); }
+        })();
+    </script>
+
+</body>
+
+</html>

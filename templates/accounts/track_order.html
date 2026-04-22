@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Track Order - CattleCart{% endblock %}
+{% block content %}
+<div class="container" style="max-width:820px;margin:40px auto;">
+    <h2>Track Order</h2>
+    {% if order and timeline %}
+        <div style="margin:20px 0;padding:16px;border:1px solid #eee;border-radius:8px;background:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div><strong>Order</strong> #: {{ order.receipt|default:order.pk }}</div>
+                <div style="color:#666">Status: {{ order.get_status_display }}</div>
+            </div>
+
+            <ol style="list-style:none;padding-left:0;margin:0;">
+                {% for step in timeline %}
+                    <li style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #f3f3f3;">
+                        <div style="width:36px;height:36px;border-radius:50%;flex:0 0 36px;display:flex;align-items:center;justify-content:center;"
+                             class="{% if step.is_completed %}completed-step{% endif %} {% if step.is_current %}current-step{% endif %}">
+                            {% if step.is_completed %}
+                                ✓
+                            {% else %}
+                                ○
+                            {% endif %}
+                        </div>
+                        <div style="flex:1">
+                            <div style="font-weight:600">{{ step.title }}</div>
+                            <div style="color:#666;font-size:13px;margin-top:4px">{{ step.desc }}</div>
+                            {% if step.time %}
+                                <div style="color:#999;font-size:12px;margin-top:6px">{{ step.time|date:"M d, Y H:i" }}</div>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ol>
+        </div>
+    {% else %}
+        <p>Enter your order ID to track its status.</p>
+    {% endif %}
+</div>
+{% endblock %}

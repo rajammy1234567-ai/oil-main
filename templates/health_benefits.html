@@ -1,0 +1,675 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Health Benefits of Cold & Single Pressed Mustard Oil - Karyor{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dark Theme Variables */
+    :root {
+        --page-bg: #353637;
+        --card-bg: #454647;
+        /* Slightly lighter than page bg for contrast */
+        --text-primary: #ffffff;
+        --text-secondary: #e0e0e0;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+        background-color: var(--page-bg);
+        color: var(--text-primary);
+    }
+
+    /* Hero Section */
+    .health-hero {
+        background: var(--page-bg);
+        padding: 120px 20px 80px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .health-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+    }
+
+    .health-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+        line-height: 1.2;
+    }
+
+    .health-hero .subtitle {
+        font-size: 1.4rem;
+        color: #dddddd;
+        max-width: 800px;
+        margin: 0 auto 30px;
+        position: relative;
+        z-index: 1;
+        line-height: 1.6;
+    }
+
+    .health-hero .author-credit {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 12px 30px;
+        border-radius: 50px;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 20px;
+        position: relative;
+        z-index: 1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Introduction Section */
+    .intro-section {
+        padding: 80px 20px;
+        background: var(--page-bg);
+    }
+
+    .intro-content {
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .intro-content h2 {
+        font-size: 2.5rem;
+        color: #ffffff;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .intro-content p {
+        font-size: 1.20rem;
+        line-height: 1.8;
+        color: #e0e0e0;
+        margin-bottom: 20px;
+    }
+
+    .intro-highlight {
+        background:black;
+        /* Darker card bg */
+        padding: 30px;
+        border-radius: 20px;
+        border-left: 5px solid #ffffff;
+        margin: 40px 0;
+        box-shadow: var(--card-shadow);
+        color: #ffffff;
+    }
+
+    .intro-highlight h3 {
+        color: #ffffff;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .intro-highlight p {
+        color: #dddddd;
+    }
+
+    /* Benefits Grid */
+    .benefits-section {
+        padding: 80px 20px;
+        background: var(--page-bg);
+    }
+
+    .benefits-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .benefits-header h2 {
+        font-size: 2.8rem;
+        color: #ffffff;
+        margin-bottom: 15px;
+        font-weight: 800;
+    }
+
+    .benefits-header p {
+        font-size: 1.2rem;
+        color: #cccccc;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .benefit-card {
+        background: black;
+        border-radius: 20px;
+        padding: 35px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .benefit-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: #ffffff;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .benefit-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        border-color: #ffffff;
+    }
+
+    .benefit-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: #ffffff;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .benefit-card h3 {
+        font-size: 1.5rem;
+        color: #ffffff;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .benefit-card p {
+        font-size: 1.12rem;
+        line-height: 1.7;
+        color: #cccccc;
+    }
+
+    /* Usage Section */
+    .usage-section {
+        padding: 80px 20px;
+        background: var(--page-bg);
+        /* Use same BG or slightly differently shaded if wanted, keeping explicit #353637 as requested for main theme */
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .usage-content {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .usage-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .usage-header h2 {
+        font-size: 2.5rem;
+        color: #ffffff;
+        margin-bottom: 15px;
+        font-weight: 800;
+    }
+
+    .usage-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+
+    .usage-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .usage-card:hover {
+        transform: translateY(-5px);
+        border-color: #ffffff;
+    }
+
+    .usage-card h4 {
+        color: #ffffff;
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .usage-card h4 i {
+        font-size: 1.5rem;
+        color: #dddddd;
+    }
+
+    .usage-card p {
+        color: #cccccc;
+        line-height: 1.6;
+        font-size: 1.12rem;
+    }
+
+    /* Precautions Section */
+    .precautions-section {
+        padding: 80px 20px;
+        background: var(--page-bg);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .precautions-content {
+        max-width: 900px;
+        margin: 0 auto;
+        background: black;
+        padding: 50px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .precautions-content h2 {
+        font-size: 2.3rem;
+        color: #ffffff;
+        margin-bottom: 25px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .precautions-content h2 i {
+        font-size: 2.5rem;
+        color: #ffffff;
+    }
+
+    .precautions-content p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #cccccc;
+        margin-bottom: 15px;
+    }
+
+    .precautions-content strong {
+        color: #ffffff;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Footer Credit */
+    .author-section {
+        padding: 60px 20px;
+        background: #2b2c2d;
+        /* Slightly darker than page-bg for footer contrast */
+        text-align: center;
+        color: #ffffff;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .author-section h3 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .author-section p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .health-hero h1 {
+            font-size: 2.2rem;
+        }
+
+        .health-hero .subtitle {
+            font-size: 1.1rem;
+        }
+
+        .intro-content h2,
+        .benefits-header h2,
+        .usage-header h2 {
+            font-size: 2rem;
+        }
+
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .precautions-content {
+            padding: 30px 20px;
+        }
+
+        .precautions-content h2 {
+            font-size: 1.8rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .benefit-card,
+    .usage-card {
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .benefit-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .benefit-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .benefit-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .benefit-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .benefit-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .benefit-card:nth-child(6) {
+        animation-delay: 0.6s;
+    }
+
+    .benefit-card:nth-child(7) {
+        animation-delay: 0.7s;
+    }
+
+    .benefit-card:nth-child(8) {
+        animation-delay: 0.8s;
+    }
+
+    .benefit-card:nth-child(9) {
+        animation-delay: 0.9s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="health-hero">
+    <h1>Impressive Health Benefits of<br>Cold & Single Pressed Mustard Oil</h1>
+    <p class="subtitle">Discover the ancient wisdom and modern science behind nature's golden elixir</p>
+    <!-- <div class="author-credit">
+        <i class="fas fa-user-md"></i> Drafted by: Dr. Ajay Kumar, Founder of KARYOR
+    </div> -->
+</section>
+
+<!-- Introduction -->
+<section class="intro-section">
+    <div class="intro-content">
+        <h2>The Traditional Method, Preserved</h2>
+        <p>Cold & Single pressed mustard oil, extracted from mustard seeds through a traditional method without the use
+            of heat or chemicals, is a staple in many Indian households.</p>
+
+        <p>Known for its pungent aroma, distinct flavor, and multiple health benefits, mustard oil has been used in
+            cooking, skincare, and medicinal practices for centuries.</p>
+
+        <p>Cold-pressing helps retain the oil's natural properties, nutrients, and active compounds, making it a
+            healthier choice compared to refined oils.</p>
+
+        <div class="intro-highlight">
+            <h3>What Makes Cold & Single Pressed Mustard Oil Special?</h3>
+            <p>Cold pressing involves extracting oil from mustard seeds without applying high heat, which helps preserve
+                its vitamins, minerals, and essential fatty acids.</p>
+
+            <p>This method ensures that the oil retains its natural antioxidants and other beneficial compounds, such as
+                omega-3 fatty acids, omega-6 fatty acids, vitamin E, and monounsaturated fats.</p>
+
+            <p>Unlike refined oils, which may lose their nutritional value during processing, Cold & Single pressed
+                mustard oil remains nutrient-rich, making it a superior option for both culinary and medicinal purposes.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Health Benefits -->
+<section class="benefits-section">
+    <div class="benefits-header">
+        <h2>9 Powerful Health Benefits</h2>
+        <p>Science-backed benefits for your wellbeing</p>
+    </div>
+
+    <div class="benefits-grid">
+        <!-- Benefit 1 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <h3>1. May Promote Heart Health</h3>
+            <p>Cold & Single pressed mustard oil is rich in monounsaturated and polyunsaturated fatty acids (MUFA and
+                PUFA), particularly omega-3 and omega-6 fatty acids. These healthy fats play a crucial role in
+                maintaining heart health by reducing bad cholesterol (LDL) levels and increasing good cholesterol (HDL)
+                levels.</p>
+            <p>This balance of cholesterol levels helps prevent the buildup of plaque in the arteries, lowering the risk
+                of heart disease, stroke, and high blood pressure. Additionally, the omega-3 fatty acids in mustard oil
+                have anti-inflammatory properties that help protect the heart and reduce inflammation in blood vessels.
+            </p>
+        </div>
+
+        <!-- Benefit 2 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-stomach"></i>
+            </div>
+            <h3>2. May Improve Digestive Health</h3>
+            <p>Mustard oil is known to stimulate digestion by promoting the secretion of digestive juices and bile,
+                which aid in breaking down food more efficiently. Its natural pungency also acts as an appetite
+                stimulant, helping people with poor appetite or digestive issues.</p>
+            <p>Cold & Single pressed mustard oil has mild laxative properties, making it useful for preventing
+                constipation and promoting regular bowel movements. By improving digestion and nutrient absorption,
+                mustard oil contributes to better overall digestive health.</p>
+        </div>
+
+        <!-- Benefit 3 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-shield-virus"></i>
+            </div>
+            <h3>3. May Boost the Immune System</h3>
+            <p>Cold & Single pressed mustard oil is a rich source of antioxidants, such as vitamin E and selenium, which
+                help strengthen the immune system. These antioxidants neutralize harmful free radicals that can cause
+                cellular damage and weaken immunity.</p>
+            <p>The antimicrobial and antifungal properties of mustard oil also make it effective in fighting infections,
+                protecting the body from harmful bacteria, fungi, and viruses. By enhancing immunity, mustard oil helps
+                the body stay resilient against common illnesses and infections.</p>
+        </div>
+
+        <!-- Benefit 4 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-spa"></i>
+            </div>
+            <h3>4. May Enhance Skin Health</h3>
+            <p>Cold & Single pressed mustard oil is a popular remedy in traditional skincare due to its rich content of
+                vitamins, antioxidants, and essential fatty acids. It is known to nourish and hydrate the skin, making
+                it soft, supple, and glowing.</p>
+            <p>Mustard oil's high vitamin E content protects the skin from environmental damage, such as pollution and
+                UV rays, which can lead to premature aging and wrinkles. And its natural anti-inflammatory properties
+                help soothe irritated skin, making it a great option for people with dry or sensitive skin.</p>
+        </div>
+
+        <!-- Benefit 5 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-cut"></i>
+            </div>
+            <h3>5. May Support Hair Growth</h3>
+            <p>Cold & Single pressed mustard oil is a well-known natural remedy for promoting hair growth and preventing
+                hair loss. The oil is rich in essential fatty acids, vitamins, and minerals that nourish the hair
+                follicles and scalp, promoting healthy hair growth.</p>
+            <p>Mustard oil also contains protein, which is essential for strong, thick hair. Its high vitamin E content
+                helps prevent premature greying and hair damage caused by environmental factors. Massaging cold & single
+                pressed mustard oil into the scalp increases blood circulation, which stimulates the hair follicles and
+                encourages hair growth. The oil's antibacterial and antifungal properties also help combat dandruff and
+                other scalp infections, keeping the scalp healthy and clean.</p>
+        </div>
+
+        <!-- Benefit 6 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-hand-holding-medical"></i>
+            </div>
+            <h3>6. May Relieve Joint and Muscle Pain</h3>
+            <p>Cold & Single pressed mustard oil is often used in traditional massage therapies to relieve joint and
+                muscle pain. The oil contains omega-3 fatty acids, which have anti-inflammatory properties that can help
+                reduce inflammation and pain in the joints.</p>
+            <p>Mustard oil is commonly used to massage people suffering from arthritis, rheumatism, and other
+                inflammatory conditions. The oil's warming effect also helps improve blood circulation and relax
+                muscles, providing relief from muscle stiffness and soreness.</p>
+        </div>
+
+        <!-- Benefit 7 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-lungs"></i>
+            </div>
+            <h3>7. May Aid in Respiratory Health</h3>
+            <p>Cold & Single pressed mustard oil is a natural decongestant and can help relieve respiratory conditions
+                such as asthma, bronchitis, and sinusitis. The pungent aroma of mustard oil helps clear the nasal
+                passages and reduce congestion, making it easier to breathe.</p>
+            <p>Mustard oil can also be used as a natural remedy for colds and coughs by applying it to the chest or
+                inhaling its vapors. The oil's anti-inflammatory properties help soothe irritated respiratory tissues,
+                providing relief from coughing and wheezing.</p>
+        </div>
+
+        <!-- Benefit 8 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-tooth"></i>
+            </div>
+            <h3>8. May Promote Oral Health</h3>
+            <p>In traditional practices, cold & single pressed mustard oil is used for oil pulling—a technique where the
+                oil is swished around the mouth to improve oral hygiene. Mustard oil's antibacterial properties help
+                kill harmful bacteria in the mouth, reducing the risk of cavities, gum disease, and bad breath.</p>
+            <p>The oil also helps strengthen the gums and teeth, promoting overall oral health. Oil pulling with mustard
+                oil can also reduce inflammation in the gums and prevent bleeding.</p>
+        </div>
+
+        <!-- Benefit 9 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <h3>9. Natural Detoxifier</h3>
+            <p>Cold & Single pressed mustard oil acts as a natural detoxifier, helping to cleanse the body of toxins and
+                impurities. The oil stimulates the liver and spleen, enhancing their detoxification functions.</p>
+            <p>Mustard oil's ability to improve digestion and promote healthy bowel movements also aids in the
+                elimination of waste and toxins from the body. By supporting the body's natural detoxification
+                processes, mustard oil helps maintain overall health and well-being.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How to Use -->
+<section class="usage-section">
+    <div class="usage-content">
+        <div class="usage-header">
+            <h2>How to Use Cold & Single Pressed Mustard Oil</h2>
+        </div>
+
+        <div class="usage-grid">
+            <div class="usage-card">
+                <h4><i class="fas fa-utensils"></i> Cooking</h4>
+                <p>Mustard oil is widely used in Indian and South Asian cuisines for cooking and frying. Its strong
+                    flavor adds depth to dishes, and its high smoke point makes it ideal for deep frying and sautéing.
+                </p>
+            </div>
+
+            <div class="usage-card">
+                <h4><i class="fas fa-hands"></i> Massage</h4>
+                <p>Mustard oil can be massaged into the skin to relieve pain, improve circulation, and promote
+                    relaxation. It is also used in scalp massages to stimulate hair growth and nourish the hair.</p>
+            </div>
+
+            <div class="usage-card">
+                <h4><i class="fas fa-heart"></i> Skincare</h4>
+                <p>Apply mustard oil directly to the skin to hydrate and nourish the skin. It can also be used as a
+                    natural remedy for acne, eczema, and other skin conditions.</p>
+            </div>
+
+            <div class="usage-card">
+                <h4><i class="fas fa-smile"></i> Oil Pulling</h4>
+                <p>Swish mustard oil in your mouth for 10-15 minutes as part of your oral hygiene routine to promote
+                    healthy teeth and gums.</p>
+            </div>
+
+            <div class="usage-card">
+                <h4><i class="fas fa-cut"></i> Hair Care</h4>
+                <p>Use mustard oil as a hair mask or scalp treatment to promote hair growth, prevent hair loss, and
+                    treat dandruff.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Precautions -->
+<section class="precautions-section">
+    <div class="precautions-content">
+        <h2><i class="fas fa-exclamation-triangle"></i> Precautions</h2>
+        <p>While cold & single pressed mustard oil offers numerous benefits, it is essential to use it in moderation.
+        </p>
+
+        <p><strong>Excessive consumption can lead to adverse effects</strong> due to its erucic acid content, which has
+            been linked to heart issues in some studies.</p>
+
+        <p><strong>Pregnant women and individuals with existing health conditions</strong> should consult a healthcare
+            professional before incorporating mustard oil into their diet.</p>
+    </div>
+</section>
+
+<!-- Author Section -->
+<section class="author-section">
+    <h3>Drafted by:</h3>
+    <p><strong>Dr. Ajay Kumar</strong></p>
+    <p>Founder of KARYOR</p>
+</section>
+{% endblock %}

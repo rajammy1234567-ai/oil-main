@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Products - Karyor    Mustard Oil{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <h2>Products</h2>
+        <div class="product-grid">
+            {% for p in products %}
+            <div class="product-card">
+                <a href="{% url 'product_detail' slug=p.slug %}">
+                    <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                </a>
+                <div class="product-info">
+                    <h3><a href="{% url 'product_detail' slug=p.slug %}">{{ p.name }}</a></h3>
+                    <p class="short-desc">{{ p.short_description }}</p>
+                    <div class="price-row">
+                        <span class="price">₹{{ p.final_price }}</span>
+                        {% if p.discount_percentage %}
+                        <span class="discount">{{ p.discount_percentage }}% off</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-outline" onclick="openProduct('{{ p.slug }}')">View</button>
+                        <button class="btn btn-primary" onclick="addToCartInline({{ p.id }}, 1)">Add to cart</button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No products available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+    function openProduct(slug) {
+        window.location.href = '/product/' + slug + '/';
+    }
+
+    function addToCartInline(productId, quantity) {
+        fetch('{% url "add_to_cart" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ product_id: productId, quantity: quantity })
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                // update header cart count if present
+                const el = document.getElementById('cartCount');
+                if (el && data.cart_count !== undefined) el.textContent = data.cart_count;
+                alert('Added to cart');
+            } else {
+                alert('Could not add to cart');
+            }
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+{% endblock %}

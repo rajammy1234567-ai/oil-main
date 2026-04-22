@@ -1,0 +1,991 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile - CattleCart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile Page Styles */   
+    .profile-page {
+        padding: 40px 0;
+        min-height: calc(100vh - 300px);
+        background: #f8f9fa;
+    }
+
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 40px;
+        padding: 30px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .profile-avatar {
+        position: relative;
+    }
+
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        border: 4px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-circle .avatar-placeholder {
+        color: white;
+        font-size: 40px;
+        font-weight: 600;
+    }
+
+    .avatar-upload {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: #3498db;
+        color: white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 2px solid white;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-upload:hover {
+        background: #2980b9;
+        transform: scale(1.1);
+    }
+
+    .profile-info h1 {
+        font-size: 28px;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .profile-info p {
+        color: #7f8c8d;
+        margin-bottom: 10px;
+    }
+
+    .member-since {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #95a5a6;
+        font-size: 14px;
+    }
+
+    /* Form Layout */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+    }
+
+    .form-section {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-section:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #27ae60, #2ecc71);
+    }
+
+    .form-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .form-icon {
+        width: 50px;
+        height: 50px;
+        background: #e8f5e9;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .form-icon svg {
+        width: 24px;
+        height: 24px;
+        color: #27ae60;
+    }
+
+    .form-title {
+        font-size: 20px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .form-subtitle {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label svg {
+        width: 16px;
+        height: 16px;
+        color: #7f8c8d;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e8e9ec;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #27ae60;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon .form-input {
+        padding-left: 45px;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #95a5a6;
+    }
+
+    .input-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #95a5a6;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Address Form */
+    .address-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    @media (min-width: 576px) {
+        .address-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e8e9ec;
+        border-radius: 10px;
+        font-size: 16px;
+        background: #f8f9fa;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237f8c8d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #27ae60;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+
+    .address-type {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .address-type-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        border: 2px solid #e8e9ec;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .address-type-option:hover {
+        border-color: #27ae60;
+    }
+
+    .address-type-option.active {
+        border-color: #27ae60;
+        background: #e8f5e9;
+    }
+
+    .address-type-option svg {
+        width: 20px;
+        height: 20px;
+        color: #7f8c8d;
+    }
+
+    .address-type-option.active svg {
+        color: #27ae60;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        max-width: 10%;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f1f2f6;
+        color: #2c3e50;
+    }
+
+    .btn-secondary:hover {
+        background: #dfe4ea;
+        transform: translateY(-2px);
+    }
+
+    /* Error Messages */
+    .error-message {
+        color: #e74c3c;
+        font-size: 14px;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .error-message svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    /* Success Message */
+    .alert-success {
+        background: #d5f7e0;
+        border: 2px solid #27ae60;
+        color: #27ae60;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.5s ease;
+    }
+
+    .alert-success svg {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+        }
+
+        .avatar-placeholder {
+            font-size: 32px;
+        }
+
+        .form-section {
+            padding: 20px;
+        }
+
+        .form-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .form-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-container {
+            padding: 0 15px;
+        }
+
+        .profile-info h1 {
+            font-size: 24px;
+        }
+
+        .address-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if missing_list %}
+            <div class="alert-warning" style="margin-bottom:12px;padding:10px;border-radius:6px;background:#fff6e5;color:#663c00;">
+                <strong>Please complete your profile</strong>
+                <div style="margin-top:6px">
+                    {% for key in missing_list %}
+                        {% if key == 'phone' %}
+                            <div>- Phone number is required so we can contact you about your order.</div>
+                        {% elif key == 'address' %}
+                            <div>- Delivery address is required so we can ship your order to the correct location.</div>
+                        {% else %}
+                            <div>- {{ key }} is required.</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <div class="avatar-circle">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                    {% else %}
+                        <div class="avatar-placeholder">{{ user.first_name|first|default:user.username|first|upper }}</div>
+                    {% endif %}
+                </div>
+                <label for="avatarUpload" class="avatar-upload" title="Upload photo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 9a3.75 3.75 0 100 7.5A3.75 3.75 0 0012 9z" />
+                        <path fill-rule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 01-3 3h-15a3 3 0 01-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 001.11-.71l.822-1.315a2.942 2.942 0 012.332-1.39zM6.75 12.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0zm12-1.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                    </svg>
+                </label>
+                <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.get_full_name|default:user.username }}</h1>
+                <p>{{ user.email|default:"No email provided" }}</p>
+                <div class="member-since">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Member since {{ user.date_joined|date:"F Y" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <form method="post" class="form-grid" id="profile-form">
+            {% csrf_token %}
+            
+            <!-- Account Information -->
+            <div class="form-section">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="form-title">Account Information</h2>
+                        <p class="form-subtitle">Update your personal details and password</p>
+                    </div>
+                </div>
+
+                <!-- First Name -->
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                        </svg>
+                        First Name
+                    </label>
+                    <div class="input-with-icon">
+                        <input type="text" name="first_name" id="id_first_name" class="form-input" 
+                               value="{{ user.first_name }}" placeholder="Enter your first name">
+                        <div class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                        </svg>
+                        Last Name
+                    </label>
+                    <div class="input-with-icon">
+                        <input type="text" name="last_name" id="id_last_name" class="form-input" 
+                               value="{{ user.last_name }}" placeholder="Enter your last name">
+                        <div class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label class="form-label" for="id_email">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+                        </svg>
+                        Email Address
+                    </label>
+                    <div class="input-with-icon">
+                        <input type="email" name="email" id="id_email" class="form-input" 
+                               value="{{ user.email }}" placeholder="Enter your email address">
+                        <div class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                                <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label class="form-label" for="id_phone">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.25 4.5a2.25 2.25 0 012.25-2.25h3a2.25 2.25 0 012.25 2.25v3A2.25 2.25 0 017.5 9h-3A2.25 2.25 0 012.25 6.75v-2.25z"/>
+                        </svg>
+                        Phone
+                    </label>
+                    <div class="input-with-icon">
+                        <input type="text" name="phone" id="id_phone" class="form-input" value="{{ user.profile.phone|default:'' }}" placeholder="Enter phone number (with country code)">
+                        <div class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2.25 4.5a2.25 2.25 0 012.25-2.25h3a2.25 2.25 0 012.25 2.25v3A2.25 2.25 0 017.5 9h-3A2.25 2.25 0 012.25 6.75v-2.25z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label class="form-label" for="id_password">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                        </svg>
+                        New Password
+                    </label>
+                    <div class="input-with-icon">
+                        <input type="password" name="password" id="id_password" class="form-input" placeholder="Enter new password (min 8 characters)">
+                        <div class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_password')">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                                <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label class="form-label" for="id_password_confirm">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M15.75 1.5a6.75 6.75 0 00-6.651 7.906c.067.39-.032.717-.221.906l-6.5 6.499a3 3 0 00-.878 2.121v2.818c0 .414.336.75.75.75H6a.75.75 0 00.75-.75v-1.5h1.5A.75.75 0 009 19.5V18h1.5a.75.75 0 00.53-.22l2.658-2.658c.19-.189.517-.288.906-.22A6.75 6.75 0 1015.75 1.5zm0 3a.75.75 0 000 1.5A2.25 2.25 0 0118 8.25a.75.75 0 001.5 0 3.75 3.75 0 00-3.75-3.75z" clip-rule="evenodd" />
+                        </svg>
+                        Confirm Password
+                    </label>
+                    <div class="input-with-icon">
+                        <input type="password" name="password_confirm" id="id_password_confirm" class="form-input" placeholder="Confirm your new password">
+                        <div class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M15.75 1.5a6.75 6.75 0 00-6.651 7.906c.067.39-.032.717-.221.906l-6.5 6.499a3 3 0 00-.878 2.121v2.818c0 .414.336.75.75.75H6a.75.75 0 00.75-.75v-1.5h1.5A.75.75 0 009 19.5V18h1.5a.75.75 0 00.53-.22l2.658-2.658c.19-.189.517-.288.906-.22A6.75 6.75 0 1015.75 1.5zm0 3a.75.75 0 000 1.5A2.25 2.25 0 0118 8.25a.75.75 0 001.5 0 3.75 3.75 0 00-3.75-3.75z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_password_confirm')">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                                <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Information -->
+            <div class="form-section">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="form-title">Address Information</h2>
+                        <p class="form-subtitle">Update your delivery address and location</p>
+                    </div>
+                </div>
+
+                <!-- Address Type -->
+                <div class="form-group">
+                    <label class="form-label">Address Type</label>
+                    <div class="address-type">
+                        <label class="address-type-option active">
+                            <input type="radio" name="address_type" value="home" checked style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+                                <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+                            </svg>
+                            <span>Home</span>
+                        </label>
+                        <label class="address-type-option">
+                            <input type="radio" name="address_type" value="farm" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM9 7.5A.75.75 0 009 9h1.5c.98 0 1.813.626 2.122 1.5H9A.75.75 0 009 12h3.622a2.251 2.251 0 01-2.122 1.5H9a.75.75 0 00-.53 1.28l3 3a.75.75 0 001.06-1.06L11.06 15h1.64a2.25 2.25 0 002.122-1.5H15a.75.75 0 000-1.5h-.178A2.251 2.251 0 0015 10.5h.178a.75.75 0 000-1.5H9z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Farm</span>
+                        </label>
+                        <label class="address-type-option">
+                            <input type="radio" name="address_type" value="business" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.5 2.25a.75.75 0 000 1.5v16.5h-.75a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5h-.75V3.75a.75.75 0 000-1.5h-15zM9 6a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5H9zm-.75 3.75A.75.75 0 019 9h1.5a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zM9 12a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5H9zm3.75-5.25A.75.75 0 0113.5 6H15a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM13.5 9a.75.75 0 000 1.5H15A.75.75 0 0015 9h-1.5zm-.75 3.75a.75.75 0 01.75-.75H15a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Business</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Address Grid -->
+                <div class="address-grid">
+                    <!-- Full Address -->
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label" for="id_full_address">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                            </svg>
+                            Full Address
+                        </label>
+                        <textarea name="full_address" id="id_full_address" class="form-input" rows="3" placeholder="Enter your complete address"></textarea>
+                    </div>
+
+                    <!-- Landmark -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_landmark">
+                            Landmark
+                        </label>
+                        <input type="text" name="landmark" id="id_landmark" class="form-input" placeholder="Enter nearest landmark">
+                    </div>
+
+                    <!-- City -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_city">
+                            City
+                        </label>
+                        <input type="text" name="city" id="id_city" class="form-input" placeholder="Enter your city">
+                    </div>
+
+                    <!-- State -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_state">
+                            State
+                        </label>
+                        <select name="state" id="id_state" class="form-select">
+                            <option value="">Select State</option>
+                            <option value="MH">Maharashtra</option>
+                            <option value="UP">Uttar Pradesh</option>
+                            <option value="PB">Punjab</option>
+                            <option value="GJ">Gujarat</option>
+                            <option value="RJ">Rajasthan</option>
+                            <option value="KA">Karnataka</option>
+                            <option value="TN">Tamil Nadu</option>
+                            <option value="AP">Andhra Pradesh</option>
+                        </select>
+                    </div>
+
+                    <!-- Pincode -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_pincode">
+                            Pincode
+                        </label>
+                        <input type="text" name="pincode" id="id_pincode" class="form-input" placeholder="Enter 6-digit pincode" maxlength="6" pattern="\d{6}">
+                    </div>
+                    </div>
+                </div>
+        <!-- Hidden canonical profile fields expected by server-side ProfileForm -->
+        <input type="hidden" name="address_line1" id="id_address_line1" value="{{ user.profile.address_line1|default:'' }}">
+        <input type="hidden" name="address_line2" id="id_address_line2" value="{{ user.profile.address_line2|default:'' }}">
+        <input type="hidden" name="city" id="id_city_hidden" value="{{ user.profile.city|default:'' }}">
+        <input type="hidden" name="state" id="id_state_hidden" value="{{ user.profile.state|default:'' }}">
+        <input type="hidden" name="postal_code" id="id_postal_code_hidden" value="{{ user.profile.postal_code|default:'' }}">
+        <input type="hidden" name="country" id="id_country_hidden" value="{{ user.profile.country|default:'India' }}">
+        </form>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" form="profile-form" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" />
+                </svg>
+                Save Changes
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'home' %}'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.28 7.72a.75.75 0 010 1.06l-2.47 2.47H21a.75.75 0 010 1.5H4.81l2.47 2.47a.75.75 0 11-1.06 1.06l-3.75-3.75a.75.75 0 010-1.06l3.75-3.75a.75.75 0 011.06 0z" clip-rule="evenodd" />
+                </svg>
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Password visibility toggle
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+    field.setAttribute('type', type);
+}
+
+// Address type selection
+document.querySelectorAll('.address-type-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.address-type-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        this.classList.add('active');
+        const radio = this.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+    });
+});
+
+// Form submission with validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profile-form');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Copy friendly inputs into canonical hidden fields expected by server
+            try{
+                const full = document.getElementById('id_full_address');
+                const city = document.getElementById('id_city');
+                const state = document.getElementById('id_state');
+                const pincode = document.getElementById('id_pincode');
+                if(document.getElementById('id_address_line1')) document.getElementById('id_address_line1').value = full ? full.value : '';
+                if(document.getElementById('id_city_hidden')) document.getElementById('id_city_hidden').value = city ? city.value : '';
+                if(document.getElementById('id_state_hidden')) document.getElementById('id_state_hidden').value = state ? state.value : '';
+                if(document.getElementById('id_postal_code_hidden')) document.getElementById('id_postal_code_hidden').value = pincode ? pincode.value : '';
+                if(document.getElementById('id_country_hidden') && !document.getElementById('id_country_hidden').value) document.getElementById('id_country_hidden').value = 'India';
+            }catch(err){/* ignore */}
+
+            const password = document.getElementById('id_password');
+            const confirmPassword = document.getElementById('id_password_confirm');
+
+            // Only validate if password is entered
+            if (password && password.value && confirmPassword) {
+                if (password.value.length < 8) {
+                    e.preventDefault();
+                    showError(password, 'Password must be at least 8 characters long');
+                    return;
+                }
+
+                if (password.value !== confirmPassword.value) {
+                    e.preventDefault();
+                    showError(confirmPassword, 'Passwords do not match');
+                    return;
+                }
+            }
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<div class="loading-spinner"></div> Saving...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+    
+    // Auto format pincode
+    const pincodeField = document.getElementById('id_pincode');
+    if (pincodeField) {
+        pincodeField.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+    }
+    
+    // Image upload preview
+    const avatarUpload = document.getElementById('avatarUpload');
+    const avatarCircle = document.querySelector('.avatar-circle');
+    
+    if (avatarUpload && avatarCircle) {
+        avatarUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Remove placeholder
+                    const placeholder = avatarCircle.querySelector('.avatar-placeholder');
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    
+                    // Add image
+                    let img = avatarCircle.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        avatarCircle.appendChild(img);
+                    }
+                    img.src = event.target.result;
+                    img.alt = 'Profile picture';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    
+                    // Show success message
+                    showToast('Profile picture uploaded successfully!');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Initialize avatar from first name
+    const firstNameField = document.getElementById('id_first_name');
+    const avatarPlaceholder = document.querySelector('.avatar-placeholder');
+    
+    if (firstNameField && avatarPlaceholder) {
+        firstNameField.addEventListener('input', function() {
+            if (this.value) {
+                avatarPlaceholder.textContent = this.value.charAt(0).toUpperCase();
+            }
+        });
+        
+        // Set initial value
+        if (firstNameField.value) {
+            avatarPlaceholder.textContent = firstNameField.value.charAt(0).toUpperCase();
+        }
+    }
+});
+
+function showError(element, message) {
+    element.classList.add('error');
+    element.focus();
+    
+    // Remove existing error message
+    const existingError = element.parentNode.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Add new error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+        </svg>
+        <span>${message}</span>
+    `;
+    
+    element.parentNode.appendChild(errorDiv);
+}
+
+function showToast(message) {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'alert-success';
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.right = '20px';
+    toast.style.zIndex = '9999';
+    toast.style.maxWidth = '400px';
+    toast.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+        </svg>
+        <span>${message}</span>
+    `;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %}
