@@ -34,10 +34,11 @@ SECRET_KEY = env('SECRET_KEY', default='dev-secret')
 DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = [
-    'karyor.com',
-    'www.karyor.com',
-    'karyor-com.onrender.com',
-    'cattle-1.onrender.com',
+    "cattle-1.onrender.com",
+    "karyor.com",
+    "www.karyor.com",
+    "localhost",
+    "127.0.0.1",
 ]
 # Add hosts from environment variable (Render)
 env_hosts = env.list('ALLOWED_HOSTS', default=[])
@@ -47,12 +48,10 @@ ALLOWED_HOSTS.extend(env_hosts)
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://cattle-1.onrender.com",
     "https://karyor.com",
     "https://www.karyor.com",
-    "https://karyor-com.onrender.com",
-    "https://cattle-1.onrender.com",
 ]
-
 # ========== CLOUDINARY CONFIGURATION ==========
 # Confirmed working credentials
 CLOUDINARY_STORAGE = {
