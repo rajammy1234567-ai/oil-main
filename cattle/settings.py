@@ -38,10 +38,7 @@ ALLOWED_HOSTS = [
     'www.karyor.com',
     'karyor-com.onrender.com',
     'cattle-1.onrender.com',
-    'localhost',
-    '127.0.0.1',
 ]
-
 # Add hosts from environment variable (Render)
 env_hosts = env.list('ALLOWED_HOSTS', default=[])
 ALLOWED_HOSTS.extend(env_hosts)
@@ -49,17 +46,12 @@ ALLOWED_HOSTS.extend(env_hosts)
 # Remove duplicates
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
-if not DEBUG:
-    CSRF_TRUSTED_ORIGINS.extend(['https://' + host for host in ALLOWED_HOSTS if not host.startswith('.')])
-    # Add specifc Render domains to trusted origins
-    CSRF_TRUSTED_ORIGINS.extend([
-        'https://karyor.com',
-        'https://www.karyor.com',
-        'https://karyor-com.onrender.com',
-        'https://cattle-1.onrender.com',
-    ])
-    CSRF_TRUSTED_ORIGINS = list(set(CSRF_TRUSTED_ORIGINS))
+CSRF_TRUSTED_ORIGINS = [
+    "https://karyor.com",
+    "https://www.karyor.com",
+    "https://karyor-com.onrender.com",
+    "https://cattle-1.onrender.com",
+]
 
 # ========== CLOUDINARY CONFIGURATION ==========
 # Confirmed working credentials
